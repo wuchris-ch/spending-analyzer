@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpendScope — Spending Analyzer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <span class="logo-text">SpendScope</span>
+            </div>
+            
+            <nav class="nav">
+                <a href="#" class="nav-item active" data-view="dashboard">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                    Dashboard
+                </a>
+                <a href="#" class="nav-item" data-view="monthly">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    Monthly
+                </a>
+                <a href="#" class="nav-item" data-view="transactions">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="8" y1="6" x2="21" y2="6"/>
+                        <line x1="8" y1="12" x2="21" y2="12"/>
+                        <line x1="8" y1="18" x2="21" y2="18"/>
+                        <line x1="3" y1="6" x2="3.01" y2="6"/>
+                        <line x1="3" y1="12" x2="3.01" y2="12"/>
+                        <line x1="3" y1="18" x2="3.01" y2="18"/>
+                    </svg>
+                    Transactions
+                </a>
+                <a href="#" class="nav-item" data-view="upload">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    Import Data
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="data-status" id="dataStatus">
+                    <div class="status-dot"></div>
+                    <span>No data loaded</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <h1 id="pageTitle">Dashboard</h1>
+                    <p class="header-subtitle" id="pageSubtitle">Overview of your spending patterns</p>
+                </div>
+                <div class="header-right">
+                    <div class="date-range-picker">
+                        <label>From</label>
+                        <input type="date" id="dateFrom" class="date-input">
+                        <label>To</label>
+                        <input type="date" id="dateTo" class="date-input">
+                        <button class="btn btn-secondary" id="applyDateFilter">Apply</button>
+                        <button class="btn btn-ghost" id="resetDateFilter">Reset</button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard View -->
+            <section class="view active" id="dashboardView">
+                <!-- Quick Stats Bar -->
+                <div class="quick-stats-bar">
+                    <div class="quick-stat">
+                        <span class="quick-stat-label">Total Spent</span>
+                        <span class="quick-stat-value" id="totalSpent">$0.00</span>
+                    </div>
+                    <div class="quick-stat-divider"></div>
+                    <div class="quick-stat">
+                        <span class="quick-stat-label">This Month</span>
+                        <span class="quick-stat-value accent" id="thisMonthSpent">$0.00</span>
+                    </div>
+                    <div class="quick-stat-divider"></div>
+                    <div class="quick-stat">
+                        <span class="quick-stat-label">Categories</span>
+                        <span class="quick-stat-value" id="categoryCount">0</span>
+                    </div>
+                    <div class="quick-stat-divider"></div>
+                    <div class="quick-stat">
+                        <span class="quick-stat-label">Transactions</span>
+                        <span class="quick-stat-value" id="transactionCount">0</span>
+                    </div>
+                </div>
+
+                <!-- Priority Section: Subscriptions -->
+                <div class="priority-category-section" id="subscriptionSection">
+                    <div class="priority-header">
+                        <div class="priority-title">
+                            <span class="priority-icon">🔄</span>
+                            <h2>Subscriptions</h2>
+                            <span class="priority-badge">RECURRING</span>
+                        </div>
+                        <div class="priority-total">
+                            <span class="priority-total-label">Total Spend</span>
+                            <span class="priority-total-value" id="subscriptionTotal">$0.00</span>
+                        </div>
+                    </div>
+                    <div class="priority-content">
+                        <div class="monthly-timeline" id="subscriptionTimeline">
+                            <div class="empty-state small">No subscription data available</div>
+                        </div>
+                        <div class="priority-breakdown" id="subscriptionBreakdown">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- All Categories Grid -->
+                <div class="categories-section">
+                    <div class="section-header">
+                        <h2>All Categories</h2>
+                        <div class="section-controls">
+                            <button class="sort-btn active" data-sort="amount">By Amount</button>
+                            <button class="sort-btn" data-sort="name">A-Z</button>
+                        </div>
+                    </div>
+                    <div class="categories-grid" id="categoriesGrid">
+                        <div class="empty-state">No data available. Load some CSV files first.</div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="recent-activity-section">
+                    <div class="section-header">
+                        <h2>Recent Activity</h2>
+                        <a href="#" class="view-all" data-view="transactions">View all →</a>
+                    </div>
+                    <div class="recent-activity-list" id="recentTransactions">
+                        <div class="empty-state small">No data available</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Monthly Breakdown View -->
+            <section class="view" id="monthlyView">
+                <div class="monthly-intro">
+                    <p>See exactly where your money goes each month. Each card shows your spending breakdown by category with visual progress bars.</p>
+                </div>
+                
+                <!-- Monthly Spend Chart -->
+                <div class="monthly-chart-card">
+                    <div class="monthly-chart-header">
+                        <h3>Monthly Spending Overview</h3>
+                        <div class="monthly-chart-stats" id="monthlyChartStats">
+                            <div class="mcs-item">
+                                <span class="mcs-label">Average</span>
+                                <span class="mcs-value" id="avgMonthlySpend">$0</span>
+                            </div>
+                            <div class="mcs-item">
+                                <span class="mcs-label">Highest</span>
+                                <span class="mcs-value highlight-high" id="highestMonthlySpend">$0</span>
+                            </div>
+                            <div class="mcs-item">
+                                <span class="mcs-label">Lowest</span>
+                                <span class="mcs-value highlight-low" id="lowestMonthlySpend">$0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="monthly-chart-container">
+                        <canvas id="monthlySpendChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="monthly-grid" id="monthlyBreakdown">
+                    <div class="empty-state">No data available. Load some CSV files first.</div>
+                </div>
+            </section>
+
+            <!-- Transactions View -->
+            <section class="view" id="transactionsView">
+                <div class="transactions-header">
+                    <div class="search-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                        <input type="text" id="searchInput" placeholder="Search transactions...">
+                    </div>
+                    <div class="filter-group">
+                        <select id="categoryFilter" class="filter-select">
+                            <option value="">All Categories</option>
+                        </select>
+                        <button class="btn btn-secondary" id="exportBtn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Export CSV
+                        </button>
+                    </div>
+                </div>
+                <div class="transactions-table-wrapper">
+                    <table class="transactions-table">
+                        <thead>
+                            <tr>
+                                <th class="sortable" data-sort="date">Date <span class="sort-icon">↕</span></th>
+                                <th class="sortable" data-sort="description">Description <span class="sort-icon">↕</span></th>
+                                <th>Category</th>
+                                <th class="sortable" data-sort="amount">Amount <span class="sort-icon">↕</span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsBody">
+                            <tr>
+                                <td colspan="4" class="empty-state">No transactions to display</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="pagination"></div>
+            </section>
+
+            <!-- Upload View -->
+            <section class="view" id="uploadView">
+                <div class="upload-container">
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                        </div>
+                        <h3>Drop your CSV files here</h3>
+                        <p>or click to browse</p>
+                        <input type="file" id="fileInput" accept=".csv" multiple hidden>
+                    </div>
+                    
+                    <div class="divider">
+                        <span>OR</span>
+                    </div>
+                    
+                    <div class="existing-files">
+                        <h3>Load Existing Files</h3>
+                        <p>Found CSV files in your project directory</p>
+                        <div class="file-list" id="existingFiles">
+                            <!-- Populated by JS -->
+                        </div>
+                        <button class="btn btn-primary" id="loadAllBtn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="1 4 1 10 7 10"/>
+                                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                            </svg>
+                            Load All Files
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="loaded-files" id="loadedFiles">
+                    <h3>Loaded Files</h3>
+                    <div class="loaded-list" id="loadedList">
+                        <div class="empty-state small">No files loaded yet</div>
+                    </div>
+                    <button class="btn btn-danger" id="clearDataBtn" style="display: none;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"/>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        </svg>
+                        Clear All Data
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="categories/categories.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
