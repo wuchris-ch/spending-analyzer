@@ -917,6 +917,9 @@ function simplifyMerchantName(description) {
     if (name.toLowerCase().includes('amazon') || name.toLowerCase().includes('amzn')) {
         return 'Amazon';
     }
+    if (name.toLowerCase().includes('doordash')) {
+        return 'DoorDash';
+    }
     
     return name;
 }
