@@ -205,6 +205,11 @@ function parseCSVLine(line) {
     }
     result.push(current.trim());
     
+    // handle trailing commas
+    if (line.endsWith(',')) {
+        result.push('');
+    }
+    
     return result;
 }
 
