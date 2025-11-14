@@ -73,6 +73,7 @@ MM/DD/YYYY,Description,Debit Amount,Credit Amount,Balance
 - Chart.js for interactive visualizations
 - Modern dark theme with financial dashboard aesthetics
 - Responsive design for all screen sizes
+- Automatic transaction categorization
 
 ## File Structure
 
