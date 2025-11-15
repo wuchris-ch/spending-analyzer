@@ -1561,7 +1561,10 @@ function updateMonthlySpendChart() {
 
 // ===== Utility Functions =====
 function formatDate(date) {
-    return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const year = date.getFullYear();
+    return `${month}/${day}/${year}`;
 }
 
 function formatCurrency(amount) {
