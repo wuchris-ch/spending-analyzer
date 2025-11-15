@@ -248,9 +248,13 @@ function initUploadZone() {
 async function handleFiles(files) {
     for (const file of files) {
         if (file.name.endsWith('.csv')) {
-            const content = await file.text();
-            const transactions = parseCSV(content, file.name);
-            addTransactions(transactions, file.name);
+            try {
+                const content = await file.text();
+                const transactions = parseCSV(content, file.name);
+                addTransactions(transactions, file.name);
+            } catch (err) {
+                console.error(`Error processing ${file.name}:`, err);
+            }
         }
     }
 }
