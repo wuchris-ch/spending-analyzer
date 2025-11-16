@@ -340,7 +340,8 @@ function addTransactions(transactions, filename) {
     updateLoadedFilesUI();
     updateDataStatus();
     applyFilters();
-    updateDashboard();
+    if (state.currentView === 'dashboard') updateDashboard();
+    if (state.currentView === 'monthly') renderMonthlyBreakdown();
     populateCategoryFilter();
 }
 
