@@ -267,6 +267,7 @@ async function initExistingFiles() {
     // Show loading state
     container.innerHTML = '<div class="discovering">Discovering CSV files...</div>';
     loadBtn.disabled = true;
+    loadBtn.textContent = 'Loading...';
     
     // Discover available CSV files
     existingFiles = await discoverCSVFiles();
