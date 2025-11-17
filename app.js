@@ -274,6 +274,7 @@ async function initExistingFiles() {
     
     // Clear loading state
     container.innerHTML = '';
+    loadBtn.textContent = 'Load All Files';
     
     if (existingFiles.length === 0) {
         container.innerHTML = `
