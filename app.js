@@ -544,7 +544,7 @@ function renderTransactions() {
 function renderPagination(totalPages) {
     const pagination = document.getElementById('pagination');
     
-    if (totalPages <= 1) {
+    if (totalPages <= 1 || totalPages === 0) {
         pagination.innerHTML = '';
         return;
     }
