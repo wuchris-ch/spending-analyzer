@@ -627,10 +627,11 @@ function updateQuickStats() {
     
     // Calculate this month's spending
     const now = new Date();
-    const thisMonthTransactions = transactions.filter(t => 
-        t.date.getMonth() === now.getMonth() && 
-        t.date.getFullYear() === now.getFullYear()
-    );
+    const thisMonthTransactions = transactions.filter(t => {
+        if (!t.date) return false;
+        return t.date.getMonth() === now.getMonth() && 
+               t.date.getFullYear() === now.getFullYear();
+    });
     const thisMonthSpent = thisMonthTransactions.reduce((sum, t) => sum + t.amount, 0);
     
     // Get unique categories count
