@@ -708,6 +708,10 @@ function renderSubscriptionSection() {
         merchantTotals[name].count++;
     });
     
+    // Sort merchants by total descending
+    const sortedMerchants = Object.entries(merchantTotals)
+        .sort((a, b) => b[1].total - a[1].total);
+    
     // Sort by total and take top items
     const sortedMerchants = Object.entries(merchantTotals)
         .sort((a, b) => b[1].total - a[1].total)
