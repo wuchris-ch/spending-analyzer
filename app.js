@@ -589,7 +589,10 @@ function renderPagination(totalPages) {
 }
 
 function exportToCSV() {
-    if (state.filteredTransactions.length === 0) return;
+    if (state.filteredTransactions.length === 0) {
+        alert('No transactions to export');
+        return;
+    }
     
     const headers = ['Date', 'Description', 'Category', 'Amount'];
     const rows = state.filteredTransactions.map(t => [
