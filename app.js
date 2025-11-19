@@ -712,10 +712,8 @@ function renderSubscriptionSection() {
     const sortedMerchants = Object.entries(merchantTotals)
         .sort((a, b) => b[1].total - a[1].total);
     
-    // Sort by total and take top items
-    const sortedMerchants = Object.entries(merchantTotals)
-        .sort((a, b) => b[1].total - a[1].total)
-        .slice(0, 12);
+    // Take top items (already sorted above)
+    const topMerchants = sortedMerchants.slice(0, 12);
     
     breakdown.innerHTML = sortedMerchants.map(([name, data]) => `
         <div class="sub-item">
