@@ -715,7 +715,7 @@ function renderSubscriptionSection() {
     // Take top items (already sorted above)
     const topMerchants = sortedMerchants.slice(0, 12);
     
-    breakdown.innerHTML = sortedMerchants.map(([name, data]) => `
+    breakdown.innerHTML = topMerchants.map(([name, data]) => `
         <div class="sub-item">
             <span class="sub-item-name" title="${name}">${name}</span>
             <span class="sub-item-amount">${formatCurrency(data.total)}</span>
