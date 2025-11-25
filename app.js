@@ -76,6 +76,7 @@ async function discoverCSVFiles() {
 
 // ===== Initialization =====
 document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
     initNavigation();
     initUploadZone();
     initExistingFiles();
@@ -83,6 +84,45 @@ document.addEventListener('DOMContentLoaded', () => {
     initCharts();
     initQuickLoadButton();
 });
+
+// ===== Theme Toggle =====
+function initTheme() {
+    const themeToggle = document.getElementById('themeToggle');
+    
+    // Check for saved theme preference or default to dark
+    const savedTheme = localStorage.getItem('spendscope-theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+    }
+}
+
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('spendscope-theme', newTheme);
+    
+    // Update Chart.js colors if charts exist
+    updateChartColors(newTheme);
+}
+
+function updateChartColors(theme) {
+    const isDark = theme === 'dark';
+    
+    // Update Chart.js defaults
+    Chart.defaults.color = isDark ? '#94a3b8' : '#64748b';
+    Chart.defaults.borderColor = isDark ? '#2a3548' : '#e2e8f0';
+    
+    // Re-render charts if they exist and we have data
+    if (state.transactions.length > 0) {
+        if (state.currentView === 'monthly') {
+            updateMonthlySpendChart();
+        }
+    }
+}
 
 // ===== Navigation =====
 function initNavigation() {
@@ -1331,9 +1371,10 @@ let categoryChart = null;
 let monthlySpendChart = null;
 
 function initCharts() {
-    // Chart.js defaults
-    Chart.defaults.color = '#94a3b8';
-    Chart.defaults.borderColor = '#2a3548';
+    // Chart.js defaults based on current theme
+    const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+    Chart.defaults.color = isDark ? '#94a3b8' : '#64748b';
+    Chart.defaults.borderColor = isDark ? '#2a3548' : '#e2e8f0';
     Chart.defaults.font.family = "'DM Sans', sans-serif";
     
     // Period buttons
@@ -1625,6 +1666,16 @@ function updateMonthlySpendChart() {
         monthlySpendChart.destroy();
     }
     
+    // Theme-aware colors
+    const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+    const tooltipBg = isDark ? '#1a2234' : '#ffffff';
+    const tooltipTitle = isDark ? '#f1f5f9' : '#0f172a';
+    const tooltipBody = isDark ? '#94a3b8' : '#475569';
+    const tooltipBorder = isDark ? '#2a3548' : '#e2e8f0';
+    const gridColor = isDark ? 'rgba(42, 53, 72, 0.5)' : 'rgba(226, 232, 240, 0.8)';
+    const tickColor = isDark ? '#94a3b8' : '#64748b';
+    const mutedColor = isDark ? '#64748b' : '#94a3b8';
+    
     monthlySpendChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -1646,10 +1697,10 @@ function updateMonthlySpendChart() {
             plugins: {
                 legend: { display: false },
                 tooltip: {
-                    backgroundColor: '#1a2234',
-                    titleColor: '#f1f5f9',
-                    bodyColor: '#94a3b8',
-                    borderColor: '#2a3548',
+                    backgroundColor: tooltipBg,
+                    titleColor: tooltipTitle,
+                    bodyColor: tooltipBody,
+                    borderColor: tooltipBorder,
                     borderWidth: 1,
                     padding: 16,
                     cornerRadius: 10,
@@ -1673,18 +1724,18 @@ function updateMonthlySpendChart() {
                 x: {
                     grid: { display: false },
                     ticks: {
-                        color: '#94a3b8',
+                        color: tickColor,
                         font: { size: 11, weight: '500' }
                     }
                 },
                 y: {
                     beginAtZero: true,
                     grid: { 
-                        color: 'rgba(42, 53, 72, 0.5)',
+                        color: gridColor,
                         drawBorder: false
                     },
                     ticks: {
-                        color: '#64748b',
+                        color: mutedColor,
                         font: { size: 11 },
                         callback: value => '$' + value.toLocaleString()
                     }
