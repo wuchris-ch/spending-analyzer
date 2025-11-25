@@ -2,6 +2,14 @@
 
 A professional spending analyzer webapp that helps you understand your financial habits through visual breakdowns of your credit card or bank account CSV exports.
 
+## Screenshots
+
+### Dashboard View
+![Dashboard](dashboard.png)
+
+### Monthly Breakdown View
+![Monthly View](monthly.png)
+
 ## Features
 
 ### 📊 Dashboard
