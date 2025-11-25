@@ -1,4 +1,4 @@
-# SpendScope — Spending Analyzer
+# SpendScope: Spending Analyzer
 
 A professional spending analyzer webapp that helps you understand your financial habits through visual breakdowns of your credit card or bank account CSV exports.
 
@@ -65,12 +65,6 @@ Transactions are automatically categorized into:
 The app expects CSV files in this format (no headers):
 ```
 MM/DD/YYYY,Description,Debit Amount,Credit Amount,Balance
-```
-
-For example:
-```
-11/17/2025,UBER CANADA/UBEREATS,26.93,,4638.85
-11/13/2025,PAYMENT - THANK YOU,,100.00,4574.88
 ```
 
 ## Tech Stack
