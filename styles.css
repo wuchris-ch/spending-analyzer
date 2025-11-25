@@ -173,6 +173,63 @@ body::before {
     border: 1px solid rgba(99, 102, 241, 0.3);
 }
 
+.nav-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: 12px 8px;
+}
+
+.nav-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    color: var(--bg-primary);
+    background: linear-gradient(135deg, var(--accent-success), #059669);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+    font-weight: 600;
+    font-size: 0.9rem;
+    font-family: var(--font-sans);
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+}
+
+.nav-action-btn svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.nav-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+}
+
+.nav-action-btn:active {
+    transform: translateY(0);
+}
+
+.nav-action-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.nav-action-btn.loading {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    animation: pulse-btn 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-btn {
+    0%, 100% { opacity: 0.9; }
+    50% { opacity: 1; }
+}
+
 .sidebar-footer {
     margin-top: auto;
     padding-top: 24px;
@@ -238,37 +295,6 @@ body::before {
     font-size: 0.9rem;
 }
 
-.date-range-picker {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: var(--bg-card);
-    padding: 12px 16px;
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border-color);
-}
-
-.date-range-picker label {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.date-input {
-    background: var(--bg-input);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    padding: 8px 12px;
-    color: var(--text-primary);
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-}
-
-.date-input:focus {
-    outline: none;
-    border-color: var(--accent-primary);
-}
 
 /* ===== Buttons ===== */
 .btn {
@@ -1121,11 +1147,17 @@ body::before {
     
     .logo-text,
     .nav-item span:not(.sort-icon),
-    .data-status span {
+    .data-status span,
+    .nav-action-btn span:not(.sort-icon) {
         display: none;
     }
     
     .nav-item {
+        justify-content: center;
+        padding: 14px;
+    }
+    
+    .nav-action-btn {
         justify-content: center;
         padding: 14px;
     }
@@ -1145,10 +1177,6 @@ body::before {
     
     .header {
         flex-direction: column;
-    }
-    
-    .date-range-picker {
-        flex-wrap: wrap;
     }
 }
 
@@ -2070,6 +2098,164 @@ body::before {
 
 .category-card.expanded .category-card-expand svg {
     transform: rotate(180deg);
+}
+
+/* ===== Dashboard Category Card Transactions Toggle ===== */
+.category-card-toggle {
+    width: 100%;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(34, 211, 238, 0.04));
+    border: none;
+    border-top: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: var(--font-sans);
+}
+
+.category-card-toggle:hover {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(34, 211, 238, 0.08));
+    color: var(--accent-secondary);
+}
+
+.category-card-toggle svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.3s ease;
+    color: var(--accent-primary);
+}
+
+.category-card-toggle.expanded svg {
+    transform: rotate(180deg);
+}
+
+.category-card-toggle.expanded {
+    background: rgba(99, 102, 241, 0.12);
+    color: var(--accent-secondary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Expandable Transactions Section */
+.category-card-transactions {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease-out;
+    background: var(--bg-input);
+}
+
+.category-card-transactions[data-expanded="true"] {
+    border-top: none;
+}
+
+.category-card-transactions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), transparent);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.category-card-transactions-header .transactions-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.category-card-transactions-header .transactions-count {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+}
+
+.category-card-transactions-list {
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 8px 0;
+}
+
+.dash-transaction-item {
+    display: grid;
+    grid-template-columns: 85px 1fr 90px;
+    gap: 12px;
+    padding: 10px 20px;
+    align-items: center;
+    transition: background 0.15s ease;
+    border-left: 3px solid transparent;
+}
+
+.dash-transaction-item:hover {
+    background: var(--bg-card-hover);
+    border-left-color: var(--accent-primary);
+}
+
+.dash-tx-date {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.dash-tx-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dash-tx-amount {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent-danger);
+    text-align: right;
+}
+
+/* Scrollbar for transactions list */
+.category-card-transactions-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.category-card-transactions-list::-webkit-scrollbar-track {
+    background: var(--bg-card);
+}
+
+.category-card-transactions-list::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+.category-card-transactions-list::-webkit-scrollbar-thumb:hover {
+    background: var(--border-hover);
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+    .dash-transaction-item {
+        grid-template-columns: 70px 1fr 75px;
+        padding: 8px 14px;
+        gap: 8px;
+    }
+    
+    .dash-tx-date {
+        font-size: 0.7rem;
+    }
+    
+    .dash-tx-desc {
+        font-size: 0.8rem;
+    }
+    
+    .dash-tx-amount {
+        font-size: 0.8rem;
+    }
 }
 
 /* Recent Activity Section */

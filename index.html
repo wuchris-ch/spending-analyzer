@@ -63,6 +63,16 @@
                     </svg>
                     Import Data
                 </a>
+                
+                <div class="nav-divider"></div>
+                
+                <button class="nav-action-btn" id="quickLoadBtn" title="Load all CSV files">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="1 4 1 10 7 10"/>
+                        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                    </svg>
+                    <span>Load All Data</span>
+                </button>
             </nav>
             
             <div class="sidebar-footer">
@@ -80,16 +90,6 @@
                 <div class="header-left">
                     <h1 id="pageTitle">Dashboard</h1>
                     <p class="header-subtitle" id="pageSubtitle">Overview of your spending patterns</p>
-                </div>
-                <div class="header-right">
-                    <div class="date-range-picker">
-                        <label>From</label>
-                        <input type="date" id="dateFrom" class="date-input">
-                        <label>To</label>
-                        <input type="date" id="dateTo" class="date-input">
-                        <button class="btn btn-secondary" id="applyDateFilter">Apply</button>
-                        <button class="btn btn-ghost" id="resetDateFilter">Reset</button>
-                    </div>
                 </div>
             </header>
 

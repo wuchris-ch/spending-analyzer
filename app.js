@@ -21,17 +21,17 @@ const categories = categorySchema;
 // CSV files will be discovered dynamically
 let existingFiles = [];
 
-// Discover CSV files in the accountactivity folder
+// Discover CSV files in the accountactivity-gitignored folder
 async function discoverCSVFiles() {
     const discovered = new Set();
     
     // Method 1: Try loading from manifest file (most reliable)
     try {
-        const manifestResponse = await fetch('accountactivity/files.json');
+        const manifestResponse = await fetch('accountactivity-gitignored/files.json');
         if (manifestResponse.ok) {
             const manifest = await manifestResponse.json();
             if (Array.isArray(manifest)) {
-                manifest.forEach(f => discovered.add(f.startsWith('accountactivity/') ? f : `accountactivity/${f}`));
+                manifest.forEach(f => discovered.add(f.startsWith('accountactivity-gitignored/') ? f : `accountactivity-gitignored/${f}`));
             }
         }
     } catch (e) {
@@ -41,7 +41,7 @@ async function discoverCSVFiles() {
     // Method 2: Try fetching directory listing (works on some servers like Python's http.server)
     if (discovered.size === 0) {
         try {
-            const response = await fetch('accountactivity/');
+            const response = await fetch('accountactivity-gitignored/');
             if (response.ok) {
                 const html = await response.text();
                 // Parse directory listing for .csv files - handles various server formats
@@ -52,7 +52,7 @@ async function discoverCSVFiles() {
                     let filename = match.replace(/^href="|"$|^>|<$/g, '');
                     if (filename.endsWith('.csv')) {
                         if (!filename.includes('/')) {
-                            filename = `accountactivity/${filename}`;
+                            filename = `accountactivity-gitignored/${filename}`;
                         }
                         discovered.add(filename);
                     }
@@ -77,11 +77,11 @@ async function discoverCSVFiles() {
 // ===== Initialization =====
 document.addEventListener('DOMContentLoaded', () => {
     initNavigation();
-    initDatePickers();
     initUploadZone();
     initExistingFiles();
     initTransactionControls();
     initCharts();
+    initQuickLoadButton();
 });
 
 // ===== Navigation =====
@@ -93,6 +93,107 @@ function initNavigation() {
             switchView(view);
         });
     });
+}
+
+// ===== Quick Load Button =====
+function initQuickLoadButton() {
+    const quickLoadBtn = document.getElementById('quickLoadBtn');
+    if (quickLoadBtn) {
+        quickLoadBtn.addEventListener('click', quickLoadAllFiles);
+    }
+}
+
+async function quickLoadAllFiles() {
+    const quickLoadBtn = document.getElementById('quickLoadBtn');
+    
+    // Discover files first if needed
+    if (existingFiles.length === 0) {
+        quickLoadBtn.classList.add('loading');
+        quickLoadBtn.disabled = true;
+        quickLoadBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="1 4 1 10 7 10"/>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+            </svg>
+            <span>Discovering...</span>
+        `;
+        
+        existingFiles = await discoverCSVFiles();
+    }
+    
+    if (existingFiles.length === 0) {
+        quickLoadBtn.classList.remove('loading');
+        quickLoadBtn.disabled = false;
+        quickLoadBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="1 4 1 10 7 10"/>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+            </svg>
+            <span>No Files Found</span>
+        `;
+        setTimeout(() => {
+            quickLoadBtn.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="1 4 1 10 7 10"/>
+                    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                </svg>
+                <span>Load All Data</span>
+            `;
+        }, 2000);
+        return;
+    }
+    
+    // Show loading state
+    quickLoadBtn.classList.add('loading');
+    quickLoadBtn.disabled = true;
+    quickLoadBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="1 4 1 10 7 10"/>
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+        </svg>
+        <span>Loading...</span>
+    `;
+    
+    // Load all files
+    let loadedCount = 0;
+    for (const file of existingFiles) {
+        if (state.loadedFiles.includes(file)) {
+            loadedCount++;
+            continue;
+        }
+        
+        try {
+            const response = await fetch(file);
+            if (!response.ok) throw new Error('File not found');
+            const content = await response.text();
+            const transactions = parseCSV(content, file);
+            addTransactions(transactions, file);
+            loadedCount++;
+        } catch (err) {
+            console.error(`Failed to load ${file}:`, err);
+        }
+    }
+    
+    // Update button to show success
+    quickLoadBtn.classList.remove('loading');
+    quickLoadBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span>Loaded ${loadedCount} files</span>
+    `;
+    
+    // Reset button after a moment
+    setTimeout(() => {
+        quickLoadBtn.disabled = false;
+        quickLoadBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="1 4 1 10 7 10"/>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+            </svg>
+            <span>Load All Data</span>
+        `;
+    }, 2000);
 }
 
 function switchView(view) {
@@ -125,24 +226,6 @@ function switchView(view) {
     if (view === 'transactions') renderTransactions();
 }
 
-// ===== Date Pickers =====
-function initDatePickers() {
-    document.getElementById('applyDateFilter').addEventListener('click', () => {
-        const from = document.getElementById('dateFrom').value;
-        const to = document.getElementById('dateTo').value;
-        state.dateRange.from = from ? new Date(from) : null;
-        state.dateRange.to = to ? new Date(to) : null;
-        applyFilters();
-    });
-    
-    document.getElementById('resetDateFilter').addEventListener('click', () => {
-        document.getElementById('dateFrom').value = '';
-        document.getElementById('dateTo').value = '';
-        state.dateRange.from = null;
-        state.dateRange.to = null;
-        applyFilters();
-    });
-}
 
 // ===== CSV Parsing =====
 function parseCSV(content, filename) {
@@ -280,7 +363,7 @@ async function initExistingFiles() {
         container.innerHTML = `
             <div class="no-files">
                 No CSV files found.<br>
-                <small>Add files to accountactivity/files.json or use drag & drop above.</small>
+                <small>Add files to accountactivity-gitignored/files.json or use drag & drop above.</small>
             </div>`;
         loadBtn.disabled = true;
         return;
@@ -621,6 +704,7 @@ function updateDashboard() {
     renderCategoriesGrid();
     updateRecentTransactions();
     initCategorySorting();
+    initDashboardCategoryToggle();
 }
 
 function updateQuickStats() {
@@ -857,6 +941,27 @@ function renderCategoriesGrid(sortBy = 'amount') {
                         </div>
                     </div>
                 ` : ''}
+                <button class="category-card-toggle" data-category="${cat}" title="View all transactions">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                    <span>View ${data.count} transaction${data.count !== 1 ? 's' : ''}</span>
+                </button>
+                <div class="category-card-transactions" id="dash-cat-${cat.replace(/[^a-zA-Z0-9]/g, '-')}" data-expanded="false">
+                    <div class="category-card-transactions-header">
+                        <span class="transactions-title">All Transactions</span>
+                        <span class="transactions-count">${data.count} total</span>
+                    </div>
+                    <div class="category-card-transactions-list">
+                        ${data.transactions.sort((a, b) => b.date - a.date).map(t => `
+                            <div class="dash-transaction-item">
+                                <span class="dash-tx-date">${formatDate(t.date)}</span>
+                                <span class="dash-tx-desc" title="${t.description}">${t.description}</span>
+                                <span class="dash-tx-amount">-$${t.amount.toFixed(2)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
             </div>
         `;
     }).join('');
@@ -868,6 +973,31 @@ function initCategorySorting() {
             document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             renderCategoriesGrid(btn.dataset.sort);
+        });
+    });
+}
+
+function initDashboardCategoryToggle() {
+    document.querySelectorAll('.category-card-toggle').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const category = btn.dataset.category;
+            const transactionsEl = document.getElementById(`dash-cat-${category.replace(/[^a-zA-Z0-9]/g, '-')}`);
+            
+            if (transactionsEl) {
+                const isExpanded = transactionsEl.dataset.expanded === 'true';
+                
+                // Toggle state
+                transactionsEl.dataset.expanded = !isExpanded;
+                btn.classList.toggle('expanded', !isExpanded);
+                
+                // Animate the height
+                if (!isExpanded) {
+                    transactionsEl.style.maxHeight = transactionsEl.scrollHeight + 'px';
+                } else {
+                    transactionsEl.style.maxHeight = '0';
+                }
+            }
         });
     });
 }

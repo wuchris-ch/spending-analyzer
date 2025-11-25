@@ -50,6 +50,13 @@ Transactions are automatically categorized into:
 ## Getting Started
 
 1. Start a local server in the project directory:
+   
+   **Option 1: Use the start script (recommended - automatically kills existing processes):**
+   ```bash
+   ./start-server.sh
+   ```
+   
+   **Option 2: Manual start:**
    ```bash
    python3 -m http.server 8888
    ```
