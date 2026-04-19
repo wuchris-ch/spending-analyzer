@@ -77,6 +77,7 @@ async function discoverCSVFiles() {
 // ===== Initialization =====
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
+    initTodayDate();
     initNavigation();
     initUploadZone();
     initExistingFiles();
@@ -84,6 +85,18 @@ document.addEventListener('DOMContentLoaded', () => {
     initCharts();
     initQuickLoadButton();
 });
+
+// ===== Masthead date =====
+function initTodayDate() {
+    const el = document.getElementById('todayDate');
+    if (!el) return;
+    const now = new Date();
+    const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const months   = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const day   = weekdays[now.getDay()];
+    const month = months[now.getMonth()];
+    el.textContent = `${day}, ${month} ${now.getDate()}`;
+}
 
 // ===== Theme Toggle =====
 function initTheme() {
@@ -111,12 +124,12 @@ function toggleTheme() {
 
 function updateChartColors(theme) {
     const isDark = theme === 'dark';
-    
-    // Update Chart.js defaults
-    Chart.defaults.color = isDark ? '#94a3b8' : '#64748b';
-    Chart.defaults.borderColor = isDark ? '#2a3548' : '#e2e8f0';
-    
-    // Re-render charts if they exist and we have data
+
+    // Ledger palette — ink & sepia
+    Chart.defaults.color = isDark ? '#9a8a6d' : '#7a6a54';
+    Chart.defaults.borderColor = isDark ? '#3a311f' : '#c7b896';
+    Chart.defaults.font.family = "'Instrument Sans', ui-sans-serif, system-ui, sans-serif";
+
     if (state.transactions.length > 0) {
         if (state.currentView === 'monthly') {
             updateMonthlySpendChart();
@@ -1371,11 +1384,10 @@ let categoryChart = null;
 let monthlySpendChart = null;
 
 function initCharts() {
-    // Chart.js defaults based on current theme
     const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
-    Chart.defaults.color = isDark ? '#94a3b8' : '#64748b';
-    Chart.defaults.borderColor = isDark ? '#2a3548' : '#e2e8f0';
-    Chart.defaults.font.family = "'DM Sans', sans-serif";
+    Chart.defaults.color = isDark ? '#9a8a6d' : '#7a6a54';
+    Chart.defaults.borderColor = isDark ? '#3a311f' : '#c7b896';
+    Chart.defaults.font.family = "'Instrument Sans', ui-sans-serif, system-ui, sans-serif";
     
     // Period buttons
     document.querySelectorAll('.chart-btn').forEach(btn => {
@@ -1639,42 +1651,34 @@ function updateMonthlySpendChart() {
     if (highEl) highEl.textContent = formatCurrency(highest);
     if (lowEl) lowEl.textContent = formatCurrency(lowest);
     
-    // Generate gradient colors based on spending (lower = green, higher = red)
+    // Ledger palette: sage (credit) → gold → oxblood (debit)
     const colors = data.map(value => {
         const ratio = (value - lowest) / (highest - lowest || 1);
-        if (ratio < 0.33) {
-            return 'rgba(34, 197, 94, 0.8)'; // Green
-        } else if (ratio < 0.66) {
-            return 'rgba(234, 179, 8, 0.8)'; // Yellow/amber
-        } else {
-            return 'rgba(244, 63, 94, 0.8)'; // Red/rose
-        }
+        if (ratio < 0.33)      return 'rgba(47, 82, 51, 0.82)';   // credit sage
+        else if (ratio < 0.66) return 'rgba(155, 116, 21, 0.82)'; // gold
+        else                    return 'rgba(154, 30, 20, 0.85)';  // debit oxblood
     });
-    
+
     const borderColors = data.map(value => {
         const ratio = (value - lowest) / (highest - lowest || 1);
-        if (ratio < 0.33) {
-            return 'rgb(34, 197, 94)';
-        } else if (ratio < 0.66) {
-            return 'rgb(234, 179, 8)';
-        } else {
-            return 'rgb(244, 63, 94)';
-        }
+        if (ratio < 0.33)      return 'rgb(47, 82, 51)';
+        else if (ratio < 0.66) return 'rgb(155, 116, 21)';
+        else                    return 'rgb(154, 30, 20)';
     });
     
     if (monthlySpendChart) {
         monthlySpendChart.destroy();
     }
     
-    // Theme-aware colors
+    // Theme-aware ledger colors
     const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
-    const tooltipBg = isDark ? '#1a2234' : '#ffffff';
-    const tooltipTitle = isDark ? '#f1f5f9' : '#0f172a';
-    const tooltipBody = isDark ? '#94a3b8' : '#475569';
-    const tooltipBorder = isDark ? '#2a3548' : '#e2e8f0';
-    const gridColor = isDark ? 'rgba(42, 53, 72, 0.5)' : 'rgba(226, 232, 240, 0.8)';
-    const tickColor = isDark ? '#94a3b8' : '#64748b';
-    const mutedColor = isDark ? '#64748b' : '#94a3b8';
+    const tooltipBg     = isDark ? '#1c160d' : '#f1ead8';
+    const tooltipTitle  = isDark ? '#e9dcc0' : '#1d1813';
+    const tooltipBody   = isDark ? '#9a8a6d' : '#3a2f25';
+    const tooltipBorder = isDark ? '#3a311f' : '#8c7b5c';
+    const gridColor     = isDark ? 'rgba(58, 49, 31, 0.6)' : 'rgba(199, 184, 150, 0.6)';
+    const tickColor     = isDark ? '#9a8a6d' : '#7a6a54';
+    const mutedColor    = isDark ? '#6b5e46' : '#a79579';
     
     monthlySpendChart = new Chart(ctx, {
         type: 'bar',
@@ -1685,10 +1689,10 @@ function updateMonthlySpendChart() {
                 data: data,
                 backgroundColor: colors,
                 borderColor: borderColors,
-                borderWidth: 2,
-                borderRadius: 8,
+                borderWidth: 1,
+                borderRadius: 0,
                 borderSkipped: false,
-                barThickness: data.length > 8 ? 40 : 60
+                barThickness: data.length > 8 ? 28 : 44
             }]
         },
         options: {
