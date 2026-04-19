@@ -76,7 +76,9 @@ body {
     font-size: 15px;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    text-wrap: pretty;
     overflow-x: hidden;
 }
 
@@ -155,6 +157,7 @@ body::before {
     font-size: clamp(40px, 5.6vw, 72px);
     letter-spacing: -0.02em;
     color: var(--ink);
+    text-wrap: balance;
 }
 
 .rule { height: 1px; background: var(--rule); border: 0; width: 100%; }
@@ -244,9 +247,10 @@ body::before {
     border: 1px solid var(--rule-strong);
     border-radius: 999px;
     white-space: nowrap;
-    transition: background .18s var(--ease), color .18s var(--ease);
+    transition: background .18s var(--ease), color .18s var(--ease), transform .12s var(--ease);
 }
 .chip-btn:hover { background: var(--tag-bg); }
+.chip-btn:active { transform: scale(0.96); }
 .chip-btn > span { white-space: nowrap; }
 .chip-btn .chip-bullet {
     font-family: var(--mono);
@@ -269,9 +273,16 @@ body::before {
     border: 1px solid var(--rule-strong);
     border-radius: 999px;
     color: var(--ink-soft);
-    transition: background .18s var(--ease);
+    position: relative;
+    transition: background .18s var(--ease), transform .12s var(--ease);
+}
+.icon-btn::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
 }
 .icon-btn:hover { background: var(--tag-bg); }
+.icon-btn:active { transform: scale(0.96); }
 .icon-btn svg { width: 16px; height: 16px; }
 .theme-icon-sun, .theme-icon-moon { display: none; }
 :root[data-theme="light"] .theme-icon-moon { display: block; }
@@ -291,9 +302,10 @@ body::before {
     background: var(--ink);
     border: 1px solid var(--ink);
     border-radius: 2px;
-    transition: background .18s var(--ease), color .18s var(--ease);
+    transition: background .18s var(--ease), color .18s var(--ease), transform .14s var(--ease);
 }
 .primary-btn:hover { background: var(--ink-soft); }
+.primary-btn:active:not(:disabled) { transform: scale(0.96); }
 .primary-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-rule {
     height: 1px;
@@ -350,6 +362,7 @@ body::before {
     letter-spacing: -0.025em;
     margin: 0;
     color: var(--ink);
+    text-wrap: balance;
 }
 .page-dek {
     margin: 14px 0 0;
@@ -360,6 +373,7 @@ body::before {
     line-height: 1.45;
     color: var(--ink-soft);
     max-width: 54ch;
+    text-wrap: pretty;
 }
 .drop-caps {
     font-family: var(--serif);
@@ -468,6 +482,7 @@ body::before {
     color: var(--ink);
     margin: 0;
     line-height: 1;
+    text-wrap: balance;
 }
 .feature-kicker {
     font-family: var(--serif);
@@ -947,6 +962,7 @@ body::before {
     color: var(--ink);
     margin: 0;
     line-height: 1;
+    text-wrap: balance;
 }
 .month-transaction-count {
     font-family: var(--serif);
@@ -1161,7 +1177,10 @@ body::before {
     border: 1px solid var(--rule-strong);
     background: var(--paper-2);
     max-width: 460px;
+    transition: border-color .18s var(--ease), background .18s var(--ease);
 }
+.search-box:focus-within { border-color: var(--ink); background: var(--paper); }
+.search-box:focus-within svg { color: var(--ink); }
 .search-box svg { width: 16px; height: 16px; color: var(--ink-mute); }
 .search-box input {
     border: 0;
@@ -1185,7 +1204,9 @@ body::before {
     font-size: 14px;
     color: var(--ink);
     min-width: 180px;
+    transition: border-color .18s var(--ease), background .18s var(--ease);
 }
+.plain-select:focus { outline: 0; border-color: var(--ink); background: var(--paper); }
 
 .ledger-wrap {
     overflow-x: auto;
@@ -1270,15 +1291,17 @@ body::before {
     flex-wrap: wrap;
 }
 .pagination button {
-    min-width: 36px;
-    padding: 6px 10px;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 6px 12px;
     font-family: var(--sans);
     font-size: 12.5px;
     color: var(--ink-mute);
     border: 1px solid var(--rule);
     background: var(--paper-2);
-    transition: color .18s var(--ease), border-color .18s var(--ease);
+    transition: color .18s var(--ease), border-color .18s var(--ease), transform .12s var(--ease);
 }
+.pagination button:active:not(:disabled) { transform: scale(0.96); }
 .pagination button:hover:not(:disabled) { color: var(--ink); border-color: var(--rule-strong); }
 .pagination button:disabled { opacity: 0.4; cursor: default; }
 .pagination button.active {
@@ -1337,6 +1360,7 @@ body::before {
     margin: 0 0 6px;
     color: var(--ink);
     letter-spacing: -0.01em;
+    text-wrap: balance;
 }
 .upload-sub {
     margin: 0;
