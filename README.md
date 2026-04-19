@@ -1,96 +1,82 @@
-# SpendScope: Spending Analyzer
+# Spending Ledger
 
-A professional spending analyzer webapp that helps you understand your financial habits through visual breakdowns of your credit card or bank account CSV exports.
+A browser-based personal spending analyzer. Imports CSV exports from your credit card or bank account, categorizes every transaction, and renders it as an editorial accounting ledger: warm paper palette, Fraunces typography, hairline rules, oxblood debit figures.
 
-## Screenshots
+Runs entirely in the browser. No backend, no tracking, your data never leaves the tab.
 
-### Dashboard View
-![Dashboard](dashboard.png)
-
-### Monthly Breakdown View
-![Monthly View](monthly.png)
+Live site: https://wuchris-ch.github.io/spending-analyzer/
 
 ## Features
 
-### 📊 Dashboard
-- **Summary Statistics**: Total spent, total payments, transaction count, and average transaction
-- **Spending Over Time**: Interactive bar chart with daily/weekly/monthly views
-- **Category Breakdown**: Donut chart showing spending distribution by category
-- **Top Merchants**: See where you spend the most
-- **Recent Transactions**: Quick view of latest activity
+### Front Page
+- Tombstone figures for total debited, this-month total, active categories, and entries on file
+- Recurring Charges section with a monthly timeline and top subscription breakdown
+- Expenditure by Section: every category ranked, with a rolling 6-month mini-series and top merchants per category
+- Latest Entries feed
 
-### 📋 Transactions
-- **Full Transaction List**: Paginated table of all transactions
-- **Search**: Find transactions by description or category
-- **Filter by Category**: Focus on specific spending categories
-- **Filter by Type**: View only spending or only payments
-- **Sortable Columns**: Sort by date, description, or amount
-- **Export to CSV**: Download filtered transactions
+### Monthly
+- Rolling bar chart of month-over-month spending with average, high, and low markers
+- Each month itemized by category, with expandable sub-category breakdown and per-transaction detail
 
-### 📁 Import Data
-- **Drag & Drop Upload**: Easy file upload interface
-- **Load Existing Files**: One-click loading of CSV files in the project directory
-- **Multiple File Support**: Load and combine multiple CSV files
-- **Clear Data**: Start fresh when needed
+### The Ledger
+- Search by description or category
+- Filter by category
+- Sort by date, description, or amount
+- CSV export of the current view
 
-### 🏷️ Automatic Categorization
-Transactions are automatically categorized into:
-- Food Delivery (Uber Eats, DoorDash, etc.)
-- Rideshare (Uber, Lyft)
-- Groceries (Costco, Instacart, etc.)
-- Shopping (Amazon, etc.)
-- Subscriptions (Netflix, Spotify, ChatGPT, etc.)
-- Gas (Esso, Shell, etc.)
-- Entertainment (Gaming, streaming)
-- Restaurants
-- Recreation (Gym, fitness)
-- Fees & Interest
-- Payments
+### Imports
+- Drag-and-drop CSV upload
+- Auto-discovery of CSVs in `accountactivity-gitignored/`
+- One-click load all entries from the masthead
+
+### Automatic Categorization
+Built-in rules cover food delivery (Uber Eats, DoorDash, Skip, Fantuan, Hungry Panda), rideshare (Uber, Lyft), groceries (Costco, Instacart, local markets), Amazon and general retail, subscriptions (Netflix, Spotify, ChatGPT, iCloud, etc.), gas, restaurants, recreation, and fees & interest. See `categories/categories.js` for the full schema, and `categories/spec.md` for the classification spec.
 
 ## Getting Started
 
 1. Start a local server in the project directory:
-   
-   **Option 1: Use the start script (recommended - automatically kills existing processes):**
    ```bash
    ./start-server.sh
    ```
-   
-   **Option 2: Manual start:**
+   or
    ```bash
    python3 -m http.server 8888
    ```
 
-2. Open your browser to `http://localhost:8888`
+2. Open `http://localhost:8888`.
 
-3. Either:
-   - Upload your own CSV files via drag & drop
-   - Click "Load All Files" to use the existing CSVs in the project
+3. Either drag CSVs onto the Imports page, or drop them into `accountactivity-gitignored/` and click "Load all entries" in the masthead.
 
 ## CSV Format
 
-The app expects CSV files in this format (no headers):
+Expected format, no header row:
+
 ```
-MM/DD/YYYY,Description,Debit Amount,Credit Amount,Balance
+MM/DD/YYYY,Description,Debit Amount,Credit Amount
 ```
+
+Only debits are tracked; credits (payments and refunds) are ignored.
+
+If auto-discovery in `accountactivity-gitignored/` is needed, list the files in `accountactivity-gitignored/files.json` as a JSON array of filenames.
 
 ## Tech Stack
 
-- Pure HTML, CSS, and JavaScript (no framework dependencies)
-- Chart.js for interactive visualizations
-- Modern dark theme with financial dashboard aesthetics
-- Responsive design for all screen sizes
-- Automatic transaction categorization
+- Plain HTML, CSS, JavaScript, no framework, no build step
+- Chart.js for the monthly bar chart
+- Fraunces, Instrument Sans, JetBrains Mono via Google Fonts
+- Light (paper) and dark (after-hours) themes, persisted to `localStorage`
 
 ## File Structure
 
 ```
 spending-analyzer/
-├── index.html          # Main HTML structure
-├── styles.css          # All styling and theme
-├── app.js              # Application logic
-├── README.md           # This file
-└── accountactivity/    # Your CSV files
-    └── *.csv
+├── index.html
+├── styles.css
+├── app.js
+├── start-server.sh
+├── categories/
+│   ├── categories.js
+│   └── spec.md
+└── accountactivity-gitignored/
+    └── *.csv         (your exports, ignored by git)
 ```
-
