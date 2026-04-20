@@ -1,8 +1,8 @@
-# SpendScope Category System Specification
+# Category System Specification
 
 ## Overview
 
-This document defines the categorization system for the SpendScope spending analyzer. The goal is to accurately categorize credit card transactions to provide meaningful spending insights.
+This document defines the categorization system for the spending analyzer. The goal is to accurately categorize credit card transactions to provide meaningful spending insights.
 
 ## Design Principles
 
