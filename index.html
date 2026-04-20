@@ -3,117 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Daily Ledger</title>
+    <title>Spending Analyzer</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..900,100;0,9..144,300..900,50;1,9..144,300..900,100&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script>
-        document.documentElement.setAttribute('data-theme', localStorage.getItem('spendscope-theme') || 'dark');
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'dark');
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="styles.css?v=20260419e">
+    <link rel="stylesheet" href="styles.css?v=20260419rethink">
 </head>
 <body>
     <div class="paper">
-        <!-- ===== Masthead ===== -->
+        <!-- ===== Top bar ===== -->
         <header class="masthead">
             <div class="masthead-row">
-                <div class="masthead-meta masthead-meta-left">
-                    <span class="vol">Vol. MMXXVI</span>
-                    <span class="dotsep">·</span>
-                    <span class="issue">No. 01</span>
-                </div>
                 <div class="masthead-wordmark">
-                    <span class="wm-the">The</span>
-                    <span class="wm-title">Spending Ledger</span>
+                    <span class="wm-title">Spending Analyzer</span>
                 </div>
-                <div class="masthead-meta masthead-meta-right">
-                    <span id="todayDate" class="today"></span>
-                </div>
-            </div>
-            <div class="rule rule-hair"></div>
-            <div class="masthead-tagline">
-                <span>A Private Account · Bound &amp; Indexed · Audited Monthly</span>
-            </div>
-            <div class="rule rule-double"></div>
-
-            <nav class="masthead-nav">
-                <div class="nav-primary">
-                    <a href="#" class="nav-item active" data-view="dashboard"><span class="nav-num">I</span><span class="nav-label">Front Page</span></a>
-                    <span class="nav-dot">·</span>
-                    <a href="#" class="nav-item" data-view="monthly"><span class="nav-num">II</span><span class="nav-label">Monthly</span></a>
-                    <span class="nav-dot">·</span>
-                    <a href="#" class="nav-item" data-view="transactions"><span class="nav-num">III</span><span class="nav-label">The Ledger</span></a>
-                    <span class="nav-dot">·</span>
-                    <a href="#" class="nav-item" data-view="upload"><span class="nav-num">IV</span><span class="nav-label">Imports</span></a>
-                </div>
+                <nav class="masthead-nav">
+                    <div class="nav-primary">
+                        <a href="#" class="nav-item active" data-view="dashboard"><span class="nav-label">Overview</span></a>
+                        <a href="#" class="nav-item" data-view="monthly"><span class="nav-label">Monthly</span></a>
+                        <a href="#" class="nav-item" data-view="transactions"><span class="nav-label">Transactions</span></a>
+                        <a href="#" class="nav-item" data-view="upload"><span class="nav-label">Import</span></a>
+                    </div>
+                </nav>
                 <div class="nav-secondary">
-                    <button class="chip-btn" id="quickLoadBtn" title="Load all CSV files">
-                        <span class="chip-bullet">↻</span>
-                        <span>Load all entries</span>
-                    </button>
-                    <button class="icon-btn" id="themeToggle" title="Toggle light/dark mode">
-                        <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <span class="data-status" id="dataStatus" title="No data loaded">
+                        <i class="status-dot"></i>
+                    </span>
+                    <button class="icon-btn" id="themeToggle" title="Toggle theme">
+                        <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
                             <circle cx="12" cy="12" r="4"/>
                             <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
                         </svg>
-                        <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
                         </svg>
                     </button>
-                    <div class="data-status" id="dataStatus">
-                        <i class="status-dot"></i>
-                        <span>No entries filed</span>
-                    </div>
                 </div>
-            </nav>
-            <div class="rule rule-hair"></div>
+            </div>
         </header>
 
         <!-- ===== Page Title ===== -->
         <section class="page-head">
             <div class="page-head-inner">
-                <div class="page-kicker">A Report From Your Accounts</div>
-                <h1 id="pageTitle" class="display-head">Front Page</h1>
-                <p id="pageSubtitle" class="page-dek">Overview of your spending patterns.</p>
+                <h1 id="pageTitle" class="display-head">Overview</h1>
+                <p id="pageSubtitle" class="page-dek">A calm look at where your money went.</p>
             </div>
-            <div class="drop-caps">§</div>
         </section>
 
         <main class="main">
             <!-- ===== Dashboard ===== -->
             <section class="view active" id="dashboardView">
 
-                <!-- Tombstone figures -->
+                <!-- Insights lede -->
+                <div class="insights" id="insightsLede" hidden>
+                    <div class="insights-head" id="insightsHead">Key insights</div>
+                    <ul class="insights-list" id="insightsList"></ul>
+                </div>
+
+                <!-- Hero metrics -->
                 <div class="tombstone">
-                    <div class="tombstone-item">
-                        <span class="tombstone-label">Total Debited</span>
+                    <div class="tombstone-item" id="tombstoneThisMonth">
+                        <span class="tombstone-label" id="tombstoneThisMonthLabel">This month</span>
+                        <span class="tombstone-value" id="thisMonthSpent">$0.00</span>
+                        <span class="tombstone-delta" id="thisMonthDelta">—</span>
+                        <span class="tombstone-spark" id="thisMonthSpark"></span>
+                    </div>
+                    <div class="tombstone-item" id="tombstoneSixMonth">
+                        <span class="tombstone-label">6-month avg</span>
+                        <span class="tombstone-value" id="sixMonthAvg">$0.00</span>
+                        <span class="tombstone-delta" id="sixMonthDelta">—</span>
+                        <span class="tombstone-spark" id="sixMonthSpark"></span>
+                    </div>
+                    <div class="tombstone-item" id="tombstoneTotal">
+                        <span class="tombstone-label" id="tombstoneTotalLabel">Total tracked</span>
                         <span class="tombstone-value" id="totalSpent">$0.00</span>
-                    </div>
-                    <div class="tombstone-item">
-                        <span class="tombstone-label">This Month</span>
-                        <span class="tombstone-value accent" id="thisMonthSpent">$0.00</span>
-                    </div>
-                    <div class="tombstone-item">
-                        <span class="tombstone-label">Categories</span>
-                        <span class="tombstone-value" id="categoryCount">0</span>
-                    </div>
-                    <div class="tombstone-item">
-                        <span class="tombstone-label">Entries on File</span>
-                        <span class="tombstone-value" id="transactionCount">0</span>
+                        <span class="tombstone-delta" id="totalMeta">—</span>
+                        <span class="tombstone-spark" id="totalSpark"></span>
                     </div>
                 </div>
 
-                <!-- ===== Subscriptions feature ===== -->
+                <!-- ===== Recent entries ===== -->
+                <section class="feature">
+                    <header class="feature-head">
+                        <div class="feature-head-left">
+                            <h2 class="feature-title">Recent activity</h2>
+                        </div>
+                        <div class="feature-head-right">
+                            <a href="#" class="view-all" data-view="transactions">View all →</a>
+                        </div>
+                    </header>
+                    <div class="feature-body">
+                        <div class="recent-list" id="recentTransactions">
+                            <div class="empty-state small">No data available</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===== Subscriptions ===== -->
                 <section class="feature" id="subscriptionSection">
                     <header class="feature-head">
                         <div class="feature-head-left">
-                            <span class="feature-num">§ I</span>
-                            <h2 class="feature-title">Recurring Charges</h2>
-                            <span class="feature-kicker">Subscriptions &amp; standing orders</span>
+                            <h2 class="feature-title">Recurring charges</h2>
                         </div>
                         <div class="feature-head-right">
-                            <span class="feature-head-label">Sum Total</span>
+                            <span class="feature-head-label">Total</span>
                             <span class="feature-head-value" id="subscriptionTotal">$0.00</span>
                         </div>
                     </header>
@@ -125,42 +122,20 @@
                     </div>
                 </section>
 
-                <!-- ===== Categories feature ===== -->
+                <!-- ===== Categories ===== -->
                 <section class="feature">
                     <header class="feature-head">
                         <div class="feature-head-left">
-                            <span class="feature-num">§ II</span>
-                            <h2 class="feature-title">Expenditure, by Section</h2>
-                            <span class="feature-kicker">All categories, ranked</span>
+                            <h2 class="feature-title">Spending by category</h2>
                         </div>
                         <div class="feature-head-right controls">
-                            <button class="sort-btn active" data-sort="amount">By Amount</button>
-                            <span class="ctrl-sep">/</span>
+                            <button class="sort-btn active" data-sort="amount">By amount</button>
                             <button class="sort-btn" data-sort="name">A–Z</button>
                         </div>
                     </header>
                     <div class="feature-body">
                         <div class="categories-grid" id="categoriesGrid">
                             <div class="empty-state">No data available. Import CSV files to begin.</div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- ===== Recent entries ===== -->
-                <section class="feature">
-                    <header class="feature-head">
-                        <div class="feature-head-left">
-                            <span class="feature-num">§ III</span>
-                            <h2 class="feature-title">The Latest Entries</h2>
-                            <span class="feature-kicker">As they were posted</span>
-                        </div>
-                        <div class="feature-head-right">
-                            <a href="#" class="view-all" data-view="transactions">See the full ledger →</a>
-                        </div>
-                    </header>
-                    <div class="feature-body">
-                        <div class="recent-list" id="recentTransactions">
-                            <div class="empty-state small">No data available</div>
                         </div>
                     </div>
                 </section>
@@ -171,23 +146,19 @@
                 <section class="feature">
                     <header class="feature-head">
                         <div class="feature-head-left">
-                            <span class="feature-num">§ I</span>
-                            <h2 class="feature-title">The Rolling Chart</h2>
-                            <span class="feature-kicker">Spending, month over month</span>
+                            <h2 class="feature-title">Month over month</h2>
                         </div>
                         <div class="feature-head-right chart-stats">
                             <div class="cs-item">
-                                <span class="cs-label">Average</span>
+                                <span class="cs-label">Avg</span>
                                 <span class="cs-value" id="avgMonthlySpend">$0</span>
                             </div>
-                            <span class="ctrl-sep">·</span>
                             <div class="cs-item">
-                                <span class="cs-label">Highest</span>
+                                <span class="cs-label">High</span>
                                 <span class="cs-value cs-high" id="highestMonthlySpend">$0</span>
                             </div>
-                            <span class="ctrl-sep">·</span>
                             <div class="cs-item">
-                                <span class="cs-label">Lowest</span>
+                                <span class="cs-label">Low</span>
                                 <span class="cs-value cs-low" id="lowestMonthlySpend">$0</span>
                             </div>
                         </div>
@@ -202,9 +173,7 @@
                 <section class="feature feature-plain">
                     <header class="feature-head">
                         <div class="feature-head-left">
-                            <span class="feature-num">§ II</span>
-                            <h2 class="feature-title">Bound by Month</h2>
-                            <span class="feature-kicker">Every month, itemised by category</span>
+                            <h2 class="feature-title">By month, in detail</h2>
                         </div>
                     </header>
                 </section>
@@ -219,43 +188,52 @@
                 <section class="feature">
                     <header class="feature-head">
                         <div class="feature-head-left">
-                            <span class="feature-num">§ —</span>
-                            <h2 class="feature-title">The Ledger</h2>
-                            <span class="feature-kicker">Every entry, searchable</span>
+                            <h2 class="feature-title">Transactions</h2>
                         </div>
                     </header>
                     <div class="feature-body">
                         <div class="tx-controls">
                             <div class="search-box">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
                                     <circle cx="11" cy="11" r="7"/>
                                     <line x1="21" y1="21" x2="16.65" y2="16.65"/>
                                 </svg>
-                                <input type="text" id="searchInput" placeholder="Search entries…">
+                                <input type="text" id="searchInput" placeholder="Search transactions…">
+                                <kbd class="search-hint">⌘K</kbd>
                             </div>
                             <div class="tx-filters">
-                                <select id="categoryFilter" class="plain-select">
-                                    <option value="">All categories</option>
-                                </select>
+                                <details class="filter-popover" id="categoryFilterPopover">
+                                    <summary class="filter-popover-trigger">
+                                        <span class="filter-popover-label" id="categoryFilterLabel">All categories</span>
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                                            <polyline points="6 9 12 15 18 9"/>
+                                        </svg>
+                                    </summary>
+                                    <div class="filter-popover-panel" id="categoryFilterPanel" role="menu"></div>
+                                </details>
                                 <button class="chip-btn" id="exportBtn">
                                     <span class="chip-bullet">↓</span>
                                     <span>Export CSV</span>
                                 </button>
                             </div>
                         </div>
+                        <div class="tx-status-row">
+                            <div class="result-count" id="resultCount">No transactions loaded.</div>
+                            <div class="active-filters" id="activeFilters"></div>
+                        </div>
                         <div class="ledger-wrap">
                             <table class="ledger-table">
                                 <thead>
                                     <tr>
-                                        <th class="sortable th-date" data-sort="date">Date <span class="sort-icon">↕</span></th>
-                                        <th class="sortable th-desc" data-sort="description">Description <span class="sort-icon">↕</span></th>
-                                        <th class="th-cat">Section</th>
-                                        <th class="sortable th-amt" data-sort="amount">Debit <span class="sort-icon">↕</span></th>
+                                        <th class="sortable th-date" data-sort="date">Date</th>
+                                        <th class="sortable th-desc" data-sort="description">Description</th>
+                                        <th class="th-cat">Category</th>
+                                        <th class="sortable th-amt" data-sort="amount">Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody id="transactionsBody">
                                     <tr>
-                                        <td colspan="4" class="empty-state">No entries to display</td>
+                                        <td colspan="4" class="empty-state">No transactions to display</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -270,16 +248,14 @@
                 <section class="feature">
                     <header class="feature-head">
                         <div class="feature-head-left">
-                            <span class="feature-num">§ I</span>
-                            <h2 class="feature-title">File New Entries</h2>
-                            <span class="feature-kicker">Drag, drop, or discover</span>
+                            <h2 class="feature-title">Import new data</h2>
                         </div>
                     </header>
                     <div class="feature-body">
                         <div class="upload-layout">
                             <div class="upload-zone" id="uploadZone">
                                 <div class="upload-mark">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
                                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                                         <polyline points="17 8 12 3 7 8"/>
                                         <line x1="12" y1="3" x2="12" y2="15"/>
@@ -291,14 +267,18 @@
                             </div>
 
                             <div class="upload-aside">
-                                <div class="aside-head">On File, Locally</div>
-                                <p class="aside-sub">CSV files discovered in <span class="mono">accountactivity-gitignored/</span></p>
+                                <div class="aside-head">Available locally</div>
+                                <p class="aside-sub">Files discovered in <span class="mono">accountactivity-gitignored/</span></p>
                                 <div class="file-list" id="existingFiles"></div>
-                                <button class="primary-btn" id="loadAllBtn">
-                                    <span class="btn-rule"></span>
-                                    <span>Load selected files</span>
-                                    <span class="btn-rule"></span>
-                                </button>
+                                <div class="upload-aside-actions">
+                                    <button class="primary-btn" id="loadAllBtn">
+                                        <span>Load selected files</span>
+                                    </button>
+                                    <button class="chip-btn" id="quickLoadBtn" title="Load all CSV files at once">
+                                        <span class="chip-bullet">↻</span>
+                                        <span>Load all</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -307,9 +287,7 @@
                 <section class="feature" id="loadedFiles">
                     <header class="feature-head">
                         <div class="feature-head-left">
-                            <span class="feature-num">§ II</span>
-                            <h2 class="feature-title">Filed &amp; Indexed</h2>
-                            <span class="feature-kicker">Files currently on the stack</span>
+                            <h2 class="feature-title">Loaded</h2>
                         </div>
                         <div class="feature-head-right">
                             <button class="chip-btn chip-btn-danger" id="clearDataBtn" style="display:none;">
@@ -327,23 +305,19 @@
             </section>
         </main>
 
-        <!-- ===== Colophon ===== -->
+        <!-- ===== Footer ===== -->
         <footer class="colophon">
-            <div class="rule rule-double"></div>
             <div class="colophon-inner">
-                <div class="colophon-mark">§</div>
                 <div class="colophon-text">
-                    <span>Set in Fraunces &amp; Instrument Sans.</span>
+                    <span>Built with Geist.</span>
                     <span class="sep">·</span>
-                    <span>Figures in JetBrains Mono.</span>
-                    <span class="sep">·</span>
-                    <span>Printed in the browser, today.</span>
+                    <span>Runs in your browser.</span>
                 </div>
             </div>
         </footer>
     </div>
 
-    <script src="categories/categories.js?v=20260419"></script>
-    <script src="app.js?v=20260419"></script>
+    <script src="categories/categories.js?v=20260419m"></script>
+    <script src="app.js?v=20260419rethink"></script>
 </body>
 </html>

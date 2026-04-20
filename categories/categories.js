@@ -1,4 +1,4 @@
-// ===== SpendScope Category System =====
+// ===== Category System =====
 // Comprehensive categorization for spending analysis
 // See spec.md for full specification details
 
